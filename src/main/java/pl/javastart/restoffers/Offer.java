@@ -18,7 +18,6 @@ public class Offer {
     private Category category;
 
 
-
     public Long getId() {
         return Id;
     }

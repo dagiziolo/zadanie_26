@@ -13,7 +13,7 @@ public class Category {
     private String name;
     private String description;
 
-    @OneToOne(mappedBy = "category")
+    @OneToMany(mappedBy = "category")
     private List<Offer> offers;
 
     public Category() {
