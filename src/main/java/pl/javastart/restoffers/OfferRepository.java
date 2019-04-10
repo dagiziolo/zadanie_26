@@ -12,8 +12,4 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
             " AND (:title IS NULL OR lower(o.title) LIKE CONCAT('%', :title, '%'))"
     )
     List<Offer> findUsingTitle(@Param("title") String title);
-//List<Offer> findAllByTitle(String title);
-//
-//    @Query(value = "select o.id, o.title, o.description, o.imgUrl, o.price, o.category.name FROM Offer o ")
-//    List<Object> findAllWithCategory();
 }

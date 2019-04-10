@@ -1,11 +1,10 @@
 package pl.javastart.restoffers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class CategoryRestController {
@@ -17,18 +16,35 @@ public class CategoryRestController {
 
     //    GET: /api/categories/names – zwraca listę nazw wszystkich dostępnych kategorii
     @GetMapping("api/categories/names")
-    public List<String> getAllCategory() {
+    public List<String> getNameCategory() {
         return categoryRepository.findAllNames();
     }
 
+    //    GET: /api/categories – zwraca listę wszystkich kategorii w serwisie.
     @GetMapping("api/categories")
-    public List<CategoryDto> getCategoriesl() {
-        List<CategoryDto> result = new ArrayList<>();
+    public List<CategoryDto> getCategories() {
+        List<CategoryDto> listCategoryDto = new ArrayList<>();
         List<Category> categories = categoryRepository.findAll();
         for (Category category : categories) {
             CategoryDto categoryDto = new CategoryDto(category.getName(), category.getDescription(), category.getOffers().size());
-            result.add(categoryDto);
+            listCategoryDto.add(categoryDto);
         }
-        return result;
+        return listCategoryDto;
+    }
+
+    //  POST: /api/categories -> pozwala dodać nową kategorię przesyłając do niego odpowiedni obiekt JSON
+    @PostMapping("api/categories")
+    public void saveCategory(@RequestBody CategoryDto categoryDto) {
+        Category category = new Category(categoryDto.getName(), categoryDto.getDescription());
+        categoryRepository.save(category);
+    }
+
+    //    DELETE: /api/categories/{id}
+    @DeleteMapping("api/categories/{id}")
+    public void removeCategory(@PathVariable long id) {
+        Optional<Category> optional = categoryRepository.findById(id);
+        if (optional.isPresent()) {
+            categoryRepository.delete(optional.get());
+        }
     }
 }

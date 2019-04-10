@@ -1,9 +1,11 @@
 package pl.javastart.restoffers;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @RestController
@@ -17,8 +19,6 @@ public class OfferRestController {
         this.categoryRepository = categoryRepository;
     }
 
-//    GET: /api/offers -> zwraca listę wszystkich ogłoszeń
-//    poniżej razem z wyszukiwaniem
 
     //    GET: /api/offers/count -> zwraca liczbę ogłoszeń w serwisie
     @GetMapping("api/offers/count")
@@ -27,12 +27,11 @@ public class OfferRestController {
         return offerNumber;
     }
 
-//    GET: /api/offers?title=param_value
-//    GET: /api/offers -> zwraca listę wszystkich ogłoszeń
+    //    GET: /api/offers -> zwraca listę wszystkich ogłoszeń
+    //    GET: /api/offers?title=param_value
     @GetMapping("api/offers")
     public List<OfferDto> getOffersByTitle(@RequestParam(required = false) String title) {
-
-        List<OfferDto> result = new ArrayList<>();
+        List<OfferDto> listOfferDto = new ArrayList<>();
         List<Offer> offers;
 
         if (title == null || title == "") {
@@ -43,17 +42,12 @@ public class OfferRestController {
 
         for (Offer offer : offers) {
             OfferDto offerDto = new OfferDto(offer.getId(), offer.getTitle(), offer.getDescription(), offer.getImgUrl(), offer.getPrice(), offer.getCategory().getName());
-            result.add(offerDto);
+            listOfferDto.add(offerDto);
         }
-        return result;
+        return listOfferDto;
     }
 
-
-//    GET: /api/categories/names – zwraca listę nazw wszystkich dostępnych kategorii
-//w category
-
-
-// POST: /api/offers – zapisuje przesłaną ofertę.
+    // POST: /api/offers – zapisuje przesłaną ofertę.
     @PostMapping("api/offers")
     public void saveOffer(@RequestBody OfferDto offerDto) {
         Category category = categoryRepository.findByName(offerDto.getCategory());
@@ -61,14 +55,25 @@ public class OfferRestController {
         offerRepository.save(newOffer);
     }
 
-//    GET: /api/categories – zwraca listę wszystkich kategorii w serwisie.
-//    w kategoriach
+    //    GET: /api/offers/{id} – zwraca ofertę o wskazanym id
+    @GetMapping("/api/offers/{id}")
+    public ResponseEntity<OfferDto> getOffer(@PathVariable long id) {
+        Optional<Offer> optional = offerRepository.findById(id);
+        if (optional.isPresent()) {
+            Offer offer = optional.get();
+            OfferDto offerDto = new OfferDto(offer.getId(), offer.getTitle(), offer.getDescription(), offer.getImgUrl(), offer.getPrice(), offer.getCategory().getName());
+            return ResponseEntity.ok(offerDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
-//    GET: /api/offers/{id} – zwraca ofertę o wskazanym id
-
-//    POST: /api/categories -> pozwala dodać nową kategorię przesyłając do niego odpowiedni obiekt JSON
-
-//    DELETE: /api/offers/{id}
-
-//    DELETE: /api/categories/{id}
+    //    DELETE: /api/offers/{id}
+    @DeleteMapping("/api/offers/{id}")
+    public void removeOffer(@PathVariable long id) {
+        Optional<Offer> optional = offerRepository.findById(id);
+        if (optional.isPresent()) {
+            offerRepository.delete(optional.get());
+        }
+    }
 }

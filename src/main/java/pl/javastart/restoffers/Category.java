@@ -13,7 +13,7 @@ public class Category {
     private String name;
     private String description;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "category")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "category", cascade = CascadeType.REMOVE)
     private List<Offer> offers;
 
     public Category() {
