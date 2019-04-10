@@ -7,12 +7,13 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface OfferRepository extends JpaRepository<Offer, Long> {
-//    @Query("SELECT o, c.name FROM Offer o " +
-//            "join Category c on c.id = o.category_id " +
-//            " WHERE 1=1 " +
-//            " AND (:title IS NULL OR m.title LIKE CONCAT('%', :title, '%'))"
-//    )
-//    List<Offer> findUsingTitle(@Param("title") String title);
+    @Query("SELECT o FROM Offer o " +
+            " WHERE 1=1 " +
+            " AND (:title IS NULL OR lower(o.title) LIKE CONCAT('%', :title, '%'))"
+    )
+    List<Offer> findUsingTitle(@Param("title") String title);
 //List<Offer> findAllByTitle(String title);
-
+//
+//    @Query(value = "select o.id, o.title, o.description, o.imgUrl, o.price, o.category.name FROM Offer o ")
+//    List<Object> findAllWithCategory();
 }
